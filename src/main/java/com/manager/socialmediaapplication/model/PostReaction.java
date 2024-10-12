@@ -16,11 +16,11 @@ public class PostReaction extends BaseEntity {
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     Post post;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "like_count")
     @ColumnDefault("0")
     Long likeCount;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "dislike_count")
     @ColumnDefault("0")
     Long dislikeCount;
 }

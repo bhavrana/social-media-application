@@ -18,7 +18,7 @@ public class EndUser extends BaseEntityExtension{
     @Column(nullable = false)
     String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     String email;
 
     @OneToMany(mappedBy = "endUser")

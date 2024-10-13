@@ -5,12 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetEndUsersResponse {
-    List<EndUserProjection> endUserList;
+    Page<EndUserProjection> endUserList;
 }

@@ -13,11 +13,11 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 public class PostUserInteraction extends BaseEntity {
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "end_user_id", referencedColumnName = "id")
     EndUser endUser;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     Post post;
 

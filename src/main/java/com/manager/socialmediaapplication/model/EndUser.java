@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "end_user")
@@ -21,15 +20,15 @@ public class EndUser extends BaseEntityExtension{
     @Column(nullable = false, unique = true)
     String email;
 
-    @OneToMany(mappedBy = "endUser")
+    @OneToMany(mappedBy = "endUser", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments;
 
-    @OneToMany(mappedBy = "endUser")
+    @OneToMany(mappedBy = "endUser", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Post> posts;
 
-    @OneToMany(mappedBy = "endUser")
-    Set<CommentUserInteraction> commentUserInteractions;
+    @OneToMany(mappedBy = "endUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<CommentUserInteraction> commentUserInteractions;
 
-    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    //Set<PostUserInteraction> postUserInteractions;
+    @OneToMany(mappedBy = "endUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostUserInteraction> postUserInteractions;
 }

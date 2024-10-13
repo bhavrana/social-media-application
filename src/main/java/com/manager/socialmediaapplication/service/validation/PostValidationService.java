@@ -1,5 +1,6 @@
 package com.manager.socialmediaapplication.service.validation;
 
+import com.manager.socialmediaapplication.exception.PostNotFoundException;
 import com.manager.socialmediaapplication.repository.PostRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +15,9 @@ public class PostValidationService {
         this.postRepository = postRepository;
     }
 
-    public boolean doesPostExist(long postId) {
-        return postRepository.existsById(postId);
+    public void doesPostExist(long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new PostNotFoundException("Post not found for Id " + postId);
+        }
     }
 }

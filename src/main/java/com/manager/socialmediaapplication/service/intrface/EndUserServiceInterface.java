@@ -1,14 +1,12 @@
-package com.manager.socialmediaapplication.service.view;
+package com.manager.socialmediaapplication.service.intrface;
 
 import com.manager.socialmediaapplication.dto.request.EndUserCreationRequest;
 import com.manager.socialmediaapplication.dto.response.GetEndUserResponse;
 import com.manager.socialmediaapplication.dto.response.GetEndUsersResponse;
 
-public interface EndUserServiceView {
+public interface EndUserServiceInterface {
     void createEndUser(EndUserCreationRequest endUserCreationRequest);
-    GetEndUsersResponse getEndUsers();
+    GetEndUsersResponse getEndUsers(Integer pageNo, Integer pageSize, String order);
 
     GetEndUserResponse getEndUserById(long userId);
-
-    void deleteEndUserById(long userId);
 }

@@ -1,5 +1,6 @@
 package com.manager.socialmediaapplication.service.validation;
 
+import com.manager.socialmediaapplication.exception.UserNotFoundException;
 import com.manager.socialmediaapplication.repository.EndUserRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +17,9 @@ public class EndUserValidationService {
         this.endUserRepository = endUserRepository;
     }
 
-    public boolean doesUserExist(long userId) {
-        return endUserRepository.existsById(userId);
+    public void doesUserExist(long userId) {
+        if(!endUserRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found for Id " + userId);
+        }
     }
 }

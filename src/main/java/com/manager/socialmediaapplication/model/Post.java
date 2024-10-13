@@ -7,12 +7,14 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
+@Table(indexes = {
+        @Index(name = "post_user_index", columnList = "end_user_id"),
+})
 public class Post extends BaseEntityExtension {
     @Column(nullable = false, length = 2500)
     String content;
@@ -21,12 +23,12 @@ public class Post extends BaseEntityExtension {
     @JoinColumn(name = "end_user_id", referencedColumnName = "id")
     EndUser endUser;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments;
 
-    @OneToOne(mappedBy = "post")
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     PostReaction postReaction;
 
-    @OneToMany(mappedBy = "post")
-    Set<PostUserInteraction> postUserInteractions;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PostUserInteraction> postUserInteractions;
 }

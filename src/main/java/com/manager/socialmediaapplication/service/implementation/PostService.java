@@ -4,45 +4,38 @@ import com.manager.socialmediaapplication.dto.request.PostCreationRequest;
 import com.manager.socialmediaapplication.dto.request.UpdatePostRequest;
 import com.manager.socialmediaapplication.dto.response.GetPostResponse;
 import com.manager.socialmediaapplication.dto.response.GetPostsResponse;
-import com.manager.socialmediaapplication.exception.PostNotFound;
-import com.manager.socialmediaapplication.exception.UserNotFoundException;
 import com.manager.socialmediaapplication.model.EndUser;
 import com.manager.socialmediaapplication.model.Post;
 import com.manager.socialmediaapplication.model.projection.PostProjection;
-import com.manager.socialmediaapplication.repository.EndUserRepository;
 import com.manager.socialmediaapplication.repository.PostRepository;
-import com.manager.socialmediaapplication.service.validation.EndUserValidationService;
-import com.manager.socialmediaapplication.service.validation.PostValidationService;
-import com.manager.socialmediaapplication.service.view.PostServiceView;
+import com.manager.socialmediaapplication.service.intrface.PostServiceInterface;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PostService implements PostServiceView {
+public class PostService implements PostServiceInterface {
     PostRepository postRepository;
-    EndUserValidationService endUserValidationService;
-    EndUserRepository endUserRepository;
-    PostValidationService postValidationService;
+    EndUserService endUserService;
+    CommentService commentService;
 
     @Autowired
-    public PostService(PostRepository postRepository, EndUserValidationService endUserValidationService, EndUserRepository endUserRepository, PostValidationService postValidationService) {
+    public PostService(PostRepository postRepository, EndUserService endUserService, CommentService commentService) {
         this.postRepository = postRepository;
-        this.endUserValidationService = endUserValidationService;
-        this.endUserRepository = endUserRepository;
-        this.postValidationService = postValidationService;
+        this.endUserService = endUserService;
+        this.commentService = commentService;
     }
 
     @Override
     public void createPost(PostCreationRequest request) {
-        if (!endUserValidationService.doesUserExist(request.getUserId())) {
-            throw new UserNotFoundException("User not found for: " + request.getUserId());
-        }
-        EndUser endUser = endUserRepository.findById(request.getUserId()).get();
+        EndUser endUser = endUserService.getEndUserById(request.getUserId());
         Post post = new Post();
         post.setContent(request.getContent());
         post.setEndUser(endUser);
@@ -50,18 +43,16 @@ public class PostService implements PostServiceView {
     }
 
     @Override
-    public GetPostsResponse getPosts() {
+    public GetPostsResponse getPosts(Integer pageSize, Integer pageNo, String order) {
         GetPostsResponse response = new GetPostsResponse();
-        List<PostProjection> postResponses = postRepository.getPosts();
+        Sort sort = "DESC".equals(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Page<PostProjection> postResponses = postRepository.getPosts(PageRequest.of(pageNo, pageSize, sort));
         response.setResponse(postResponses);
         return response;
     }
 
     @Override
     public GetPostResponse getPost(Long postId) {
-        if (!postValidationService.doesPostExist(postId)) {
-            throw new PostNotFound("Post not found for: " + postId);
-        }
         GetPostResponse response = new GetPostResponse();
         PostProjection postProjection = postRepository.findPostByPostId(postId);
         response.setPostProjection(postProjection);
@@ -70,18 +61,16 @@ public class PostService implements PostServiceView {
 
     @Override
     public GetPostResponse updatePost(long postId, UpdatePostRequest request) {
-        if (!postValidationService.doesPostExist(postId)) {
-            throw new PostNotFound("Post not found for: " + postId);
-        }
         postRepository.updatePostById(postId, request.getUpdatedContent());
         return getPost(postId);
     }
 
     @Override
-    public void deletePost(Long id) {
-        if (!postValidationService.doesPostExist(id)) {
-            throw new PostNotFound("Post not found for: " + id);
-        }
-        postRepository.deleteById(id);
+    public GetPostsResponse getPostForUserId(long userId, Integer pageSize, Integer pageNo, String order) {
+        GetPostsResponse response = new GetPostsResponse();
+        Sort sort = "DESC".equals(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Page<PostProjection> postResponses = postRepository.getPostForUserId(userId, PageRequest.of(pageNo, pageSize, sort));
+        response.setResponse(postResponses);
+        return response;
     }
 }

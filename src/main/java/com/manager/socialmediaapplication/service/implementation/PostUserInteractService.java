@@ -1,9 +1,6 @@
 package com.manager.socialmediaapplication.service.implementation;
 
 import com.manager.socialmediaapplication.dto.response.GetEndUsersResponse;
-import com.manager.socialmediaapplication.dto.response.GetPostResponse;
-import com.manager.socialmediaapplication.exception.PostNotFound;
-import com.manager.socialmediaapplication.exception.UserNotFoundException;
 import com.manager.socialmediaapplication.model.EndUser;
 import com.manager.socialmediaapplication.model.Post;
 import com.manager.socialmediaapplication.model.PostReaction;
@@ -13,13 +10,13 @@ import com.manager.socialmediaapplication.repository.EndUserRepository;
 import com.manager.socialmediaapplication.repository.PostReactionRepository;
 import com.manager.socialmediaapplication.repository.PostRepository;
 import com.manager.socialmediaapplication.repository.PostUserInteractionRepository;
-import com.manager.socialmediaapplication.service.validation.EndUserValidationService;
-import com.manager.socialmediaapplication.service.validation.PostValidationService;
-import com.manager.socialmediaapplication.service.view.PostUserInteractServiceView;
+import com.manager.socialmediaapplication.service.intrface.PostUserInteractServiceInterface;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,60 +25,43 @@ import java.util.Optional;
 @Service
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PostUserInteractService implements PostUserInteractServiceView {
-    PostValidationService postValidationService;
+public class PostUserInteractService implements PostUserInteractServiceInterface {
     PostUserInteractionRepository postUserInteractionRepository;
+    PostReactionRepository postReactionRepository;
     PostRepository postRepository;
     EndUserRepository endUserRepository;
-    PostReactionRepository postReactionRepository;
-    EndUserValidationService endUserValidationService;
-    PostService postService;
 
     @Autowired
-    public PostUserInteractService(PostValidationService postValidationService, PostUserInteractionRepository postUserInteractionRepository, PostRepository postRepository, EndUserRepository endUserRepository, PostReactionRepository postReactionRepository, EndUserValidationService endUserValidationService, PostService postService) {
-        this.postValidationService = postValidationService;
+    public PostUserInteractService(PostUserInteractionRepository postUserInteractionRepository, PostReactionRepository postReactionRepository, PostRepository postRepository, EndUserRepository endUserRepository) {
         this.postUserInteractionRepository = postUserInteractionRepository;
+        this.postReactionRepository = postReactionRepository;
         this.postRepository = postRepository;
         this.endUserRepository = endUserRepository;
-        this.postReactionRepository = postReactionRepository;
-        this.endUserValidationService = endUserValidationService;
-        this.postService = postService;
     }
 
     @Override
-    public GetPostResponse likePost(Long postId, Long userId) {
-        if (!postValidationService.doesPostExist(postId)) {
-            throw new PostNotFound("Post not found for Id " + postId);
-        }
-        if(!endUserValidationService.doesUserExist(userId)) {
-            throw new UserNotFoundException("User not found for Id " + userId);
-        }
+    public void likePost(Long postId, Long userId) {
         // check if active entry exists under postUserInteraction
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
         if (optionalPostUserInteraction.isPresent()) {
-            // undo like by marking it as is_active false and decrement post like count
             PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
 
             PostReaction postReaction = optionalPostReaction.get();
-            if (postUserInteraction.getIsLiked()) {
-                postUserInteraction.setIsActive(false);
 
-                Long likeCount = postReaction.getLikeCount();
-                postReaction.setLikeCount(likeCount - 1);
-            } else {
+            if (!postUserInteraction.getIsLiked()) {
                 postUserInteraction.setIsLiked(true);
-                //inc like count
                 Long likeCount = postReaction.getLikeCount();
                 postReaction.setLikeCount(likeCount + 1);
-                //dec dislike count
                 Long dislikeCount = postReaction.getDislikeCount();
                 postReaction.setDislikeCount(dislikeCount - 1);
+                postUserInteractionRepository.save(postUserInteraction);
+                postReactionRepository.save(postReaction);
+            } else {
+                log.info("The Post is already liked!");
             }
-            postUserInteractionRepository.save(postUserInteraction);
-            // update post reaction counter
-            postReactionRepository.save(postReaction);
+
         } else {
             // Add like for post for the user
             Post post = postRepository.findById(postId).get();
@@ -106,45 +86,31 @@ public class PostUserInteractService implements PostUserInteractServiceView {
                 postReactionRepository.save(postReaction);
             }
         }
-        return postService.getPost(postId);
     }
 
     @Override
-    public GetPostResponse dislikePost(Long postId, Long userId) {
-        if (!postValidationService.doesPostExist(postId)) {
-            throw new PostNotFound("Post not found for: Id " + postId);
-        }
-        if(!endUserValidationService.doesUserExist(userId)) {
-            throw new UserNotFoundException("User not found for Id " + userId);
-        }
+    public void dislikePost(Long postId, Long userId) {
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
         if (optionalPostUserInteraction.isPresent()) {
-            // undo like by marking it as is_active false and decrement post like count
             PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
-
             PostReaction postReaction = optionalPostReaction.get();
-            if (!postUserInteraction.getIsLiked()) {
-                postUserInteraction.setIsActive(false);
-
-                Long dislikeCount = postReaction.getDislikeCount();
-                postReaction.setLikeCount(dislikeCount - 1);
-            } else {
+            if (postUserInteraction.getIsLiked()) {
                 postUserInteraction.setIsLiked(false);
-                //inc dislike count
                 Long dislikeCount = postReaction.getDislikeCount();
                 postReaction.setDislikeCount(dislikeCount + 1);
-                //dec like count
                 Long likeCount = postReaction.getLikeCount();
                 postReaction.setLikeCount(likeCount - 1);
+                postUserInteractionRepository.save(postUserInteraction);
+                postReactionRepository.save(postReaction);
+            } else {
+                log.info("The Post is already disliked!");
             }
-            postUserInteractionRepository.save(postUserInteraction);
-            // update post reaction counter
-            postReactionRepository.save(postReaction);
+
         } else {
             // Add dislike for post for the user
-            Post post = postRepository.findById(postId).get();
+            Post post =   postRepository.findById(postId).get();
             EndUser endUser = endUserRepository.findById(userId).get();
             PostUserInteraction postUserInteraction = new PostUserInteraction();
             postUserInteraction.setPost(post);
@@ -166,28 +132,77 @@ public class PostUserInteractService implements PostUserInteractServiceView {
                 postReactionRepository.save(postReaction);
             }
         }
-        return postService.getPost(postId);
     }
 
     @Override
-    public GetEndUsersResponse getUserWhoLikedPostById(Long postId) {
-        if (!postValidationService.doesPostExist(postId)) {
-            throw new PostNotFound("Post not found for Id " + postId);
-        }
+    public GetEndUsersResponse getUserWhoLikedPostById(Long postId, Integer pageNo, Integer pageSize) {
         GetEndUsersResponse response = new GetEndUsersResponse();
-        List<EndUserProjection> endUserProjectionList = postUserInteractionRepository.getUserLikeInteractionByPostId(postId);
+        Page<EndUserProjection> endUserProjectionList = postUserInteractionRepository.getUserLikeInteractionByPostId(postId, PageRequest.of(pageNo, pageSize));
         response.setEndUserList(endUserProjectionList);
         return response;
     }
 
     @Override
-    public GetEndUsersResponse getUserWhoDislikedPostById(Long postId) {
-        if (!postValidationService.doesPostExist(postId)) {
-            throw new PostNotFound("Post not found for Id " + postId);
-        }
+    public GetEndUsersResponse getUserWhoDislikedPostById(Long postId, Integer pageNo, Integer pageSize) {
         GetEndUsersResponse response = new GetEndUsersResponse();
-        List<EndUserProjection> endUserProjectionList = postUserInteractionRepository.getUserDislikeInteractionByPostId(postId);
+        Page<EndUserProjection> endUserProjectionList = postUserInteractionRepository.getUserDislikeInteractionByPostId(postId, PageRequest.of(pageNo, pageSize));
         response.setEndUserList(endUserProjectionList);
         return response;
+    }
+
+    @Override
+    public void removeLikePost(long postId, long userId) {
+        // check if active entry exists under postUserInteraction
+        Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
+                .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
+        Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
+        if (optionalPostUserInteraction.isPresent()) {
+            PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
+
+            PostReaction postReaction = optionalPostReaction.get();
+            if (postUserInteraction.getIsLiked()) {
+                postUserInteraction.setIsActive(false);
+                Long likeCount = postReaction.getLikeCount();
+                postReaction.setLikeCount(likeCount - 1);
+                postUserInteractionRepository.save(postUserInteraction);
+                postReactionRepository.save(postReaction);
+            }
+        }
+    }
+
+    @Override
+    public void removeDislikePost(long postId, long userId) {
+        // check if active entry exists under postUserInteraction
+        Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
+                .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
+        Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
+        if (optionalPostUserInteraction.isPresent()) {
+            PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
+            PostReaction postReaction = optionalPostReaction.get();
+            if (!postUserInteraction.getIsLiked()) {
+                postUserInteraction.setIsActive(false);
+
+                Long dislikeCount = postReaction.getDislikeCount();
+                postReaction.setDislikeCount(dislikeCount - 1);
+                postUserInteractionRepository.save(postUserInteraction);
+                postReactionRepository.save(postReaction);
+            }
+        }
+    }
+
+    List<PostUserInteraction> getPostUserInteractionByUserId(long userId) {
+        return postUserInteractionRepository.findByEndUser_IdAndIsActive(userId, true);
+    }
+
+    Optional<PostReaction> getPostReactionByPostId(Long id) {
+        return postReactionRepository.findByPost_Id(id);
+    }
+
+    void deletePostReactionById(Long id) {
+        postReactionRepository.deleteById(id);
+    }
+
+    void savePostReaction(PostReaction postReaction) {
+        postReactionRepository.save(postReaction);
     }
 }

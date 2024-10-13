@@ -2,13 +2,13 @@ package com.manager.socialmediaapplication.repository;
 
 import com.manager.socialmediaapplication.model.EndUser;
 import com.manager.socialmediaapplication.model.projection.EndUserProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface EndUserRepository extends JpaRepository<EndUser, Long> {
 
-    List<EndUserProjection> findAllProjectedBy();
+    Page<EndUserProjection> findAllProjectedBy(Pageable pageable);
 
     EndUserProjection findEndUserById(Long id);
 

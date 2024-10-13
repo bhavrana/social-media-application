@@ -6,35 +6,41 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
+@Table(indexes = {
+        @Index(name = "column-post-index", columnList = "post_id"),
+        @Index(name = "column-parent-index", columnList = "parent_id")
+})
 public class Comment extends BaseEntityExtension {
     @Column(nullable = false, columnDefinition = "text", length = 2500)
     String content;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "end_user_id", referencedColumnName = "id")
     EndUser endUser;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     Post post;
 
-    @OneToOne(mappedBy = "comment") //-----
+    @OneToOne(mappedBy = "comment")
     CommentReaction commentReaction;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
     Comment parent;
 
-    @OneToMany(mappedBy="parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> children;
 
-    @OneToMany(mappedBy = "comment")
-    Set<CommentUserInteraction> commentUserInteractions;
+    //@Column(nullable = true, name = "parent_id")
+    //Long parentId;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<CommentUserInteraction> commentUserInteractions;
 }

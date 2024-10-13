@@ -5,7 +5,10 @@ import com.manager.socialmediaapplication.dto.request.UpdatePostRequest;
 import com.manager.socialmediaapplication.dto.response.GetPostResponse;
 import com.manager.socialmediaapplication.dto.response.GetPostsResponse;
 
-import com.manager.socialmediaapplication.service.view.PostServiceView;
+import com.manager.socialmediaapplication.service.intrface.PostServiceInterface;
+import com.manager.socialmediaapplication.service.validation.CommentValidationService;
+import com.manager.socialmediaapplication.service.validation.EndUserValidationService;
+import com.manager.socialmediaapplication.service.validation.PostValidationService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -18,37 +21,51 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/post")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostController {
-    PostServiceView postServiceView;
+    PostServiceInterface postServiceInterface;
+    EndUserValidationService endUserValidationService;
+    PostValidationService postValidationService;
+    private final CommentValidationService commentValidationService;
 
     @Autowired
-    public PostController(PostServiceView postServiceView) {
-        this.postServiceView = postServiceView;
+    public PostController(PostServiceInterface postServiceInterface, EndUserValidationService endUserValidationService, PostValidationService postValidationService, CommentValidationService commentValidationService) {
+        this.postServiceInterface = postServiceInterface;
+        this.endUserValidationService = endUserValidationService;
+        this.postValidationService = postValidationService;
+        this.commentValidationService = commentValidationService;
     }
 
     @PostMapping
     public ResponseEntity<HttpStatus> createPost(@Valid @RequestBody PostCreationRequest postCreationRequest) {
-        postServiceView.createPost(postCreationRequest);
+        endUserValidationService.doesUserExist(postCreationRequest.getUserId());
+        postServiceInterface.createPost(postCreationRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{postId}")
     public ResponseEntity<GetPostResponse> updatePost(@PathVariable long postId, @Valid @RequestBody UpdatePostRequest request) {
-        return ResponseEntity.ok(postServiceView.updatePost(postId, request));
+        postValidationService.doesPostExist(postId);
+        return ResponseEntity.ok(postServiceInterface.updatePost(postId, request));
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<GetPostResponse> getPost(@PathVariable long postId) {
-        return ResponseEntity.ok(postServiceView.getPost(postId));
+        postValidationService.doesPostExist(postId);
+        return ResponseEntity.ok(postServiceInterface.getPost(postId));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<GetPostsResponse> getPostForUser(@PathVariable long userId,
+                                                           @RequestParam(value = "pageSize", defaultValue = "3", required = false) Integer pageSize,
+                                                           @RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo,
+                                                           @RequestParam(value = "sorting", defaultValue = "DESC", required = false) String order) {
+        endUserValidationService.doesUserExist(userId);
+        return ResponseEntity.ok(postServiceInterface.getPostForUserId(userId, pageSize, pageNo, order));
     }
 
     @GetMapping
-    public ResponseEntity<GetPostsResponse> getAllPosts() {
-        return ResponseEntity.ok(postServiceView.getPosts());
-    }
-
-    @DeleteMapping("/{postId}")
-    public ResponseEntity<HttpStatus> deletePost(@PathVariable long postId) {
-        postServiceView.deletePost(postId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<GetPostsResponse> getAllPosts(@RequestParam(value = "pageSize", defaultValue = "3", required = false) Integer pageSize,
+                                                        @RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo,
+                                                        @RequestParam(value = "sorting", defaultValue = "DESC", required = false) String order) {
+        return ResponseEntity.ok(postServiceInterface.getPosts(pageSize, pageNo, order));
     }
 }

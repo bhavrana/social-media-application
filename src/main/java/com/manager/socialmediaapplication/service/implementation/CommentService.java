@@ -20,8 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -52,7 +50,7 @@ public class CommentService implements CommentServiceInterface {
     @Override
     public GetCommentsResponse getCommentsForPost(Long postId, Integer pageSize, Integer pageNumber, String order) {
         GetCommentsResponse response = new GetCommentsResponse();
-        Sort sort = "DESC".equals(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Sort sort = "DESC".equalsIgnoreCase(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
         Page<CommentProjection> commentProjections = commentRepository.getCommentsByPost(postId, PageRequest.of(pageNumber, pageSize, sort));
         response.setResponse(commentProjections);
         return response;
@@ -61,7 +59,7 @@ public class CommentService implements CommentServiceInterface {
     @Override
     public GetCommentsResponse getCommentsForParent(Long parentCommentId, Integer pageSize, Integer pageNumber, String order) {
         GetCommentsResponse response = new GetCommentsResponse();
-        Sort sort = "DESC".equals(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Sort sort = "DESC".equalsIgnoreCase(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
         Page<CommentProjection> commentProjections = commentRepository.findCommentsByCommentParentId(parentCommentId , PageRequest.of(pageNumber, pageSize, sort));
         response.setResponse(commentProjections);
         return response;
@@ -76,11 +74,11 @@ public class CommentService implements CommentServiceInterface {
         return response;
     }
 
-    Comment getCommentById(Long commentId) {
+    public Comment getCommentById(Long commentId) {
         return commentRepository.findById(commentId).get();
     }
 
-    CommentProjection getCommentProjectionById(Long commentId) {
+    public CommentProjection getCommentProjectionById(Long commentId) {
         return commentRepository.findCommentByCommentId(commentId);
     }
 }

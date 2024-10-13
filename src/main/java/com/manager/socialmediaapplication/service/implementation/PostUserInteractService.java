@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -165,7 +164,11 @@ public class PostUserInteractService implements PostUserInteractServiceInterface
                 Long likeCount = postReaction.getLikeCount();
                 postReaction.setLikeCount(likeCount - 1);
                 postUserInteractionRepository.save(postUserInteraction);
-                postReactionRepository.save(postReaction);
+                if (postReaction.getLikeCount() == 0 && postReaction.getDislikeCount() == 0) {
+                    deletePostReactionById(postReaction.getId());
+                } else {
+                    postReactionRepository.save(postReaction);
+                }
             }
         }
     }
@@ -185,24 +188,16 @@ public class PostUserInteractService implements PostUserInteractServiceInterface
                 Long dislikeCount = postReaction.getDislikeCount();
                 postReaction.setDislikeCount(dislikeCount - 1);
                 postUserInteractionRepository.save(postUserInteraction);
-                postReactionRepository.save(postReaction);
+                if (postReaction.getLikeCount() == 0 && postReaction.getDislikeCount() == 0) {
+                    deletePostReactionById(postReaction.getId());
+                } else {
+                    postReactionRepository.save(postReaction);
+                }
             }
         }
     }
 
-    List<PostUserInteraction> getPostUserInteractionByUserId(long userId) {
-        return postUserInteractionRepository.findByEndUser_IdAndIsActive(userId, true);
-    }
-
-    Optional<PostReaction> getPostReactionByPostId(Long id) {
-        return postReactionRepository.findByPost_Id(id);
-    }
-
     void deletePostReactionById(Long id) {
         postReactionRepository.deleteById(id);
-    }
-
-    void savePostReaction(PostReaction postReaction) {
-        postReactionRepository.save(postReaction);
     }
 }

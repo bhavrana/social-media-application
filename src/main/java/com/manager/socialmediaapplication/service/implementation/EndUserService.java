@@ -51,7 +51,7 @@ public class EndUserService implements EndUserServiceInterface {
     @Override
     public GetEndUsersResponse getEndUsers(Integer pageNo, Integer pageSize, String orderBy) {
         GetEndUsersResponse response = new GetEndUsersResponse();
-        Sort sort = "DESC".equals(orderBy) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Sort sort = "DESC".equalsIgnoreCase(orderBy) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
         Page<EndUserProjection> endUsers = endUserRepository.findAllProjectedBy(PageRequest.of(pageNo, pageSize, sort));
         response.setEndUserList(endUsers);
         return response;

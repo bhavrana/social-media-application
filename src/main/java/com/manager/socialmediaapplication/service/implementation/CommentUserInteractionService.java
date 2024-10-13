@@ -170,7 +170,11 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
                 Long likeCount = commentReaction.getLikeCount();
                 commentReaction.setLikeCount(likeCount - 1);
                 commentUserInteractionRepository.save(commentUserInteraction);
-                commentReactionRepository.save(commentReaction);
+                if (commentReaction.getLikeCount() == 0 && commentReaction.getDislikeCount() == 0) {
+                    deleteCommentReactionById(commentReaction.getId());
+                } else {
+                    commentReactionRepository.save(commentReaction);
+                }
             }
         }
         CommentProjection commentProjection = commentService.getCommentProjectionById(commentId);
@@ -193,7 +197,11 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
                 Long dislikeCount = commentReaction.getDislikeCount();
                 commentReaction.setDislikeCount(dislikeCount - 1);
                 commentUserInteractionRepository.save(commentUserInteraction);
-                commentReactionRepository.save(commentReaction);
+                if (commentReaction.getLikeCount() == 0 && commentReaction.getDislikeCount() == 0) {
+                    deleteCommentReactionById(commentReaction.getId());
+                } else {
+                    commentReactionRepository.save(commentReaction);
+                }
             }
         }
         CommentProjection commentProjection = commentService.getCommentProjectionById(commentId);
@@ -202,15 +210,7 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
         return getCommentResponse;
     }
 
-    Optional<CommentReaction> getCommentReactionByCommentId(Long commentId) {
-        return commentReactionRepository.findByComment_Id(commentId);
-    }
-
     void deleteCommentReactionById(Long id) {
         commentReactionRepository.deleteById(id);
-    }
-
-    void saveCommentReaction(CommentReaction commentReaction) {
-        commentReactionRepository.save(commentReaction);
     }
 }

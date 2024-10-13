@@ -45,7 +45,7 @@ public class PostService implements PostServiceInterface {
     @Override
     public GetPostsResponse getPosts(Integer pageSize, Integer pageNo, String order) {
         GetPostsResponse response = new GetPostsResponse();
-        Sort sort = "DESC".equals(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Sort sort = "DESC".equalsIgnoreCase(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
         Page<PostProjection> postResponses = postRepository.getPosts(PageRequest.of(pageNo, pageSize, sort));
         response.setResponse(postResponses);
         return response;
@@ -68,7 +68,7 @@ public class PostService implements PostServiceInterface {
     @Override
     public GetPostsResponse getPostForUserId(long userId, Integer pageSize, Integer pageNo, String order) {
         GetPostsResponse response = new GetPostsResponse();
-        Sort sort = "DESC".equals(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
+        Sort sort = "DESC".equalsIgnoreCase(order) ? Sort.by("CREATED_DATE").descending() : Sort.by("CREATED_DATE").ascending();
         Page<PostProjection> postResponses = postRepository.getPostForUserId(userId, PageRequest.of(pageNo, pageSize, sort));
         response.setResponse(postResponses);
         return response;

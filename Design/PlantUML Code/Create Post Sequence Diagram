@@ -1,0 +1,23 @@
+@startuml
+
+actor User
+participant Post_Controller
+participant End_User_Validation_Service
+participant Post_Service
+database DB
+
+User -> Post_Controller : Create Post
+Post_Controller -> End_User_Validation_Service : Validate User
+alt user validation failed
+  End_User_Validation_Service -> Post_Controller : User validation failed
+  Post_Controller -> User : Failed to create post
+else user validation successful
+  End_User_Validation_Service -> Post_Controller : OK
+  Post_Controller -> Post_Service : Create post for user
+  Post_Service -> DB : Save post data for user
+  DB -> Post_Service : OK
+  Post_Service -> Post_Controller : OK
+  Post_Controller -> User : Post created successfully
+end
+
+@enduml

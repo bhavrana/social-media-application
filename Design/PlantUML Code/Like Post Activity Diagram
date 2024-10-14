@@ -1,0 +1,27 @@
+@startuml
+
+start
+: Like Post;
+if (validate user) then (NOK)
+  : Invalid user;
+else (OK)
+  if (validate post) then (NOK)
+    : Invalid post;
+  else (OK)
+    if (check user already likes post) then (yes)
+      : User already likes post. Nothing to do;
+    else (no)
+      if (check user dislikes post) then (yes)
+        : Increment post like counter;
+        : Decrement post dislike counter;
+        : Update user post interaction from dislike to like;
+      else (no)
+        : Increment post like counter;
+        : Add new user post interaction with like;
+      endif
+    endif
+  endif
+endif
+stop
+
+@enduml

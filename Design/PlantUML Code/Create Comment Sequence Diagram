@@ -1,0 +1,39 @@
+@startuml
+
+actor User
+participant Comment_Controller
+participant End_User_Validation_Service
+participant Post_Validation_Service
+participant Comment_Validation_Service
+participant Comment_Service
+database DB
+
+User -> Comment_Controller : Comment on post
+Comment_Controller -> End_User_Validation_Service : Validate user
+alt user validation failed
+  End_User_Validation_Service -> Comment_Controller : NOK
+  Comment_Controller -> User : Failed to comment (invalid user)
+else user validation successful
+  End_User_Validation_Service -> Comment_Controller : OK
+  Comment_Controller -> Post_Validation_Service : Validate post on which comment is made
+  alt post validation failed
+    Post_Validation_Service -> Comment_Controller : NOK
+    Comment_Controller -> User : Failed to comment (invalid post)
+  else post validation successful
+    Post_Validation_Service -> Comment_Controller : OK
+    Comment_Controller -> Comment_Validation_Service : Validate comment parent
+    alt comment parent validation failed
+      Comment_Validation_Service -> Comment_Controller : NOK
+      Comment_Controller -> User : Failed to comment (invalid parent comment)
+    else
+      Comment_Validation_Service -> Comment_Controller : OK
+      Comment_Controller -> Comment_Service : Add comment to post
+      Comment_Service -> DB : Save comment to post
+      DB -> Comment_Service : OK
+      Comment_Service -> Comment_Controller : Saved comment to post
+      Comment_Controller -> User : Added comment to post
+    end
+  end
+end
+
+@enduml

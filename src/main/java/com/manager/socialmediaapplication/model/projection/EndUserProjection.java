@@ -4,5 +4,4 @@ public interface EndUserProjection {
     String getId();
     String getName();
     String getEmail();
-
 }

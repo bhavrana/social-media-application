@@ -17,21 +17,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EndUserService implements EndUserServiceInterface {
 
     EndUserRepository endUserRepository;
-    PostUserInteractService postUserInteractService;
+    PostUserInteractionService postUserInteractionService;
     CommentUserInteractionService commentUserInteractionService;
 
     @Autowired
-    public EndUserService(EndUserRepository endUserRepository, PostUserInteractService postUserInteractService, CommentUserInteractionService commentUserInteractionService) {
+    public EndUserService(EndUserRepository endUserRepository, PostUserInteractionService postUserInteractionService, CommentUserInteractionService commentUserInteractionService) {
         this.endUserRepository = endUserRepository;
-        this.postUserInteractService = postUserInteractService;
+        this.postUserInteractionService = postUserInteractionService;
         this.commentUserInteractionService = commentUserInteractionService;
     }
 
@@ -58,14 +56,14 @@ public class EndUserService implements EndUserServiceInterface {
     }
 
     @Override
-    public GetEndUserResponse getEndUserById(long userId) {
+    public GetEndUserResponse getEndUserResponseById(long userId) {
         GetEndUserResponse response = new GetEndUserResponse();
         EndUserProjection endUserProjection = endUserRepository.findEndUserById(userId);
         response.setEndUserProjection(endUserProjection);
         return response;
     }
 
-    EndUser getEndUserById(Long userId) {
+    public EndUser getEndUserById(Long userId) {
         return  endUserRepository.findById(userId).get();
     }
 }

@@ -8,5 +8,5 @@ public interface EndUserServiceInterface {
     void createEndUser(EndUserCreationRequest endUserCreationRequest);
     GetEndUsersResponse getEndUsers(Integer pageNo, Integer pageSize, String order);
 
-    GetEndUserResponse getEndUserById(long userId);
+    GetEndUserResponse getEndUserResponseById(long userId);
 }

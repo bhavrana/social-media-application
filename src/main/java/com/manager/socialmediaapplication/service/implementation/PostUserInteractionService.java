@@ -10,7 +10,7 @@ import com.manager.socialmediaapplication.repository.EndUserRepository;
 import com.manager.socialmediaapplication.repository.PostReactionRepository;
 import com.manager.socialmediaapplication.repository.PostRepository;
 import com.manager.socialmediaapplication.repository.PostUserInteractionRepository;
-import com.manager.socialmediaapplication.service.intrface.PostUserInteractServiceInterface;
+import com.manager.socialmediaapplication.service.intrface.PostUserInteractionerviceInterface;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +24,14 @@ import java.util.Optional;
 @Service
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PostUserInteractService implements PostUserInteractServiceInterface {
+public class PostUserInteractionService implements PostUserInteractionerviceInterface {
     PostUserInteractionRepository postUserInteractionRepository;
     PostReactionRepository postReactionRepository;
     PostRepository postRepository;
     EndUserRepository endUserRepository;
 
     @Autowired
-    public PostUserInteractService(PostUserInteractionRepository postUserInteractionRepository, PostReactionRepository postReactionRepository, PostRepository postRepository, EndUserRepository endUserRepository) {
+    public PostUserInteractionService(PostUserInteractionRepository postUserInteractionRepository, PostReactionRepository postReactionRepository, PostRepository postRepository, EndUserRepository endUserRepository) {
         this.postUserInteractionRepository = postUserInteractionRepository;
         this.postReactionRepository = postReactionRepository;
         this.postRepository = postRepository;
@@ -44,7 +44,7 @@ public class PostUserInteractService implements PostUserInteractServiceInterface
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
-        if (optionalPostUserInteraction.isPresent()) {
+        if (optionalPostUserInteraction.isPresent() && optionalPostReaction.isPresent()) {
             PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
 
             PostReaction postReaction = optionalPostReaction.get();
@@ -92,7 +92,7 @@ public class PostUserInteractService implements PostUserInteractServiceInterface
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
-        if (optionalPostUserInteraction.isPresent()) {
+        if (optionalPostUserInteraction.isPresent() && optionalPostReaction.isPresent()) {
             PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
             PostReaction postReaction = optionalPostReaction.get();
             if (postUserInteraction.getIsLiked()) {
@@ -155,7 +155,7 @@ public class PostUserInteractService implements PostUserInteractServiceInterface
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
-        if (optionalPostUserInteraction.isPresent()) {
+        if (optionalPostUserInteraction.isPresent() && optionalPostReaction.isPresent()) {
             PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
 
             PostReaction postReaction = optionalPostReaction.get();
@@ -179,7 +179,7 @@ public class PostUserInteractService implements PostUserInteractServiceInterface
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
-        if (optionalPostUserInteraction.isPresent()) {
+        if (optionalPostUserInteraction.isPresent() && optionalPostReaction.isPresent()) {
             PostUserInteraction postUserInteraction = optionalPostUserInteraction.get();
             PostReaction postReaction = optionalPostReaction.get();
             if (!postUserInteraction.getIsLiked()) {

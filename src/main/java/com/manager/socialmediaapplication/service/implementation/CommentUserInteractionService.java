@@ -42,7 +42,7 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
         // check if active entry exists under postUserInteraction
         Optional<CommentUserInteraction> optionalCommentUserInteraction = commentUserInteractionRepository.findByEndUser_IdAndIsActiveAndComment_Id(userId, true,  commentId);
         Optional<CommentReaction> optionalCommentReaction = commentReactionRepository.findByComment_Id(commentId);
-        if (optionalCommentUserInteraction.isPresent()) {
+        if (optionalCommentUserInteraction.isPresent() && optionalCommentReaction.isPresent()) {
             CommentUserInteraction commentUserInteraction = optionalCommentUserInteraction.get();
 
             CommentReaction commentReaction = optionalCommentReaction.get();
@@ -93,7 +93,7 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
         // check if active entry exists under postUserInteraction
         Optional<CommentUserInteraction> optionalCommentUserInteraction = commentUserInteractionRepository.findByEndUser_IdAndIsActiveAndComment_Id(userId, true,  commentId);
         Optional<CommentReaction> optionalCommentReaction = commentReactionRepository.findByComment_Id(commentId);
-        if (optionalCommentUserInteraction.isPresent()) {
+        if (optionalCommentUserInteraction.isPresent() && optionalCommentReaction.isPresent()) {
             CommentUserInteraction commentUserInteraction = optionalCommentUserInteraction.get();
 
             CommentReaction commentReaction = optionalCommentReaction.get();
@@ -161,7 +161,7 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
         Optional<CommentUserInteraction> optionalCommentUserInteraction = commentUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndComment_Id(userId, true,  commentId);
         Optional<CommentReaction> optionalCommentReaction = commentReactionRepository.findByComment_Id(commentId);
-        if (optionalCommentUserInteraction.isPresent()) {
+        if (optionalCommentUserInteraction.isPresent() && optionalCommentReaction.isPresent()) {
             CommentUserInteraction commentUserInteraction = optionalCommentUserInteraction.get();
 
             CommentReaction commentReaction = optionalCommentReaction.get();
@@ -188,7 +188,7 @@ public class CommentUserInteractionService implements CommentUserInteractionServ
         Optional<CommentUserInteraction> optionalCommentUserInteraction = commentUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndComment_Id(userId, true,  commentId);
         Optional<CommentReaction> optionalCommentReaction = commentReactionRepository.findByComment_Id(commentId);
-        if (optionalCommentUserInteraction.isPresent()) {
+        if (optionalCommentUserInteraction.isPresent() && optionalCommentReaction.isPresent()) {
             CommentUserInteraction commentUserInteraction = optionalCommentUserInteraction.get();
             CommentReaction commentReaction = optionalCommentReaction.get();
             if (!commentUserInteraction.getIsLiked()) {

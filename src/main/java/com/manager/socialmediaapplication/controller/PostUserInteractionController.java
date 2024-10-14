@@ -3,7 +3,7 @@ package com.manager.socialmediaapplication.controller;
 import com.manager.socialmediaapplication.dto.response.GetEndUsersResponse;
 import com.manager.socialmediaapplication.dto.response.GetPostResponse;
 import com.manager.socialmediaapplication.service.intrface.PostServiceInterface;
-import com.manager.socialmediaapplication.service.intrface.PostUserInteractServiceInterface;
+import com.manager.socialmediaapplication.service.intrface.PostUserInteractionerviceInterface;
 import com.manager.socialmediaapplication.service.validation.EndUserValidationService;
 import com.manager.socialmediaapplication.service.validation.PostValidationService;
 import lombok.AccessLevel;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/post/interact")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostUserInteractionController {
-    PostUserInteractServiceInterface postUserInteractServiceInterface;
+    PostUserInteractionerviceInterface postUserInteractionerviceInterface;
     PostServiceInterface postServiceInterface;
     PostValidationService postValidationService;
     EndUserValidationService endUserValidationService;
 
     @Autowired
-    public PostUserInteractionController(PostUserInteractServiceInterface postUserInteractServiceInterface, PostServiceInterface postServiceInterface, PostValidationService postValidationService, EndUserValidationService endUserValidationService) {
-        this.postUserInteractServiceInterface = postUserInteractServiceInterface;
+    public PostUserInteractionController(PostUserInteractionerviceInterface postUserInteractionerviceInterface, PostServiceInterface postServiceInterface, PostValidationService postValidationService, EndUserValidationService endUserValidationService) {
+        this.postUserInteractionerviceInterface = postUserInteractionerviceInterface;
         this.postServiceInterface = postServiceInterface;
         this.postValidationService = postValidationService;
         this.endUserValidationService = endUserValidationService;
@@ -34,7 +34,7 @@ public class PostUserInteractionController {
                                                                        @RequestParam(value = "pageSize", defaultValue = "3", required = false) Integer pageSize,
                                                                        @RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo) {
         postValidationService.doesPostExist(postId);
-        return ResponseEntity.ok(postUserInteractServiceInterface.getUserWhoLikedPostById(postId, pageNo, pageSize));
+        return ResponseEntity.ok(postUserInteractionerviceInterface.getUserWhoLikedPostById(postId, pageNo, pageSize));
     }
 
     @GetMapping("/dislike/{postId}")
@@ -42,14 +42,14 @@ public class PostUserInteractionController {
                                                                           @RequestParam(value = "pageSize", defaultValue = "3", required = false) Integer pageSize,
                                                                           @RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo) {
         postValidationService.doesPostExist(postId);
-        return ResponseEntity.ok(postUserInteractServiceInterface.getUserWhoDislikedPostById(postId, pageNo, pageSize));
+        return ResponseEntity.ok(postUserInteractionerviceInterface.getUserWhoDislikedPostById(postId, pageNo, pageSize));
     }
 
     @PutMapping("/like")
     public ResponseEntity<GetPostResponse> likePost(@RequestParam(name = "post_id") long postId, @RequestParam(name = "user_id") long userId) {
         postValidationService.doesPostExist(postId);
         endUserValidationService.doesUserExist(userId);
-        postUserInteractServiceInterface.likePost(postId, userId);
+        postUserInteractionerviceInterface.likePost(postId, userId);
         return ResponseEntity.ok(postServiceInterface.getPost(postId));
     }
 
@@ -57,7 +57,7 @@ public class PostUserInteractionController {
     public ResponseEntity<GetPostResponse> dislikePost(@RequestParam(name = "post_id") long postId, @RequestParam(name = "user_id") long userId) {
         postValidationService.doesPostExist(postId);
         endUserValidationService.doesUserExist(userId);
-        postUserInteractServiceInterface.dislikePost(postId, userId);
+        postUserInteractionerviceInterface.dislikePost(postId, userId);
         return ResponseEntity.ok(postServiceInterface.getPost(postId));
     }
 
@@ -65,7 +65,7 @@ public class PostUserInteractionController {
     public ResponseEntity<GetPostResponse> removeLikePost(@RequestParam(name = "post_id") long postId, @RequestParam(name = "user_id") long userId) {
         postValidationService.doesPostExist(postId);
         endUserValidationService.doesUserExist(userId);
-        postUserInteractServiceInterface.removeLikePost(postId, userId);
+        postUserInteractionerviceInterface.removeLikePost(postId, userId);
         return ResponseEntity.ok(postServiceInterface.getPost(postId));
     }
 
@@ -73,7 +73,7 @@ public class PostUserInteractionController {
     public ResponseEntity<GetPostResponse> removeDislikePost(@RequestParam(name = "post_id") long postId, @RequestParam(name = "user_id") long userId) {
         postValidationService.doesPostExist(postId);
         endUserValidationService.doesUserExist(userId);
-        postUserInteractServiceInterface.removeDislikePost(postId, userId);
+        postUserInteractionerviceInterface.removeDislikePost(postId, userId);
         return ResponseEntity.ok(postServiceInterface.getPost(postId));
     }
 }

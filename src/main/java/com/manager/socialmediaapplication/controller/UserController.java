@@ -43,6 +43,6 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<GetEndUserResponse> getEndUserById(@PathVariable long userId) {
         endUserValidationService.doesUserExist(userId);
-        return ResponseEntity.ok(endUserServiceInterface.getEndUserById(userId));
+        return ResponseEntity.ok(endUserServiceInterface.getEndUserResponseById(userId));
     }
 }

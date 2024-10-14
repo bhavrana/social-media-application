@@ -2,7 +2,7 @@ package com.manager.socialmediaapplication.service.intrface;
 
 import com.manager.socialmediaapplication.dto.response.GetEndUsersResponse;
 
-public interface PostUserInteractServiceInterface {
+public interface PostUserInteractionerviceInterface {
     void likePost(Long postId, Long userId);
 
     void dislikePost(Long postId, Long userId);

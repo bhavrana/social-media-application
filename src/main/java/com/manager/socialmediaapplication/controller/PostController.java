@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,10 +34,10 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createPost(@Valid @RequestBody PostCreationRequest postCreationRequest) {
+    public ResponseEntity<GetPostResponse> createPost(@Valid @RequestBody PostCreationRequest postCreationRequest) {
         endUserValidationService.doesUserExist(postCreationRequest.getUserId());
-        postServiceInterface.createPost(postCreationRequest);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        GetPostResponse response = postServiceInterface.createPost(postCreationRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{postId}")

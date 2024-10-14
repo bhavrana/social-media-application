@@ -5,7 +5,7 @@ import com.manager.socialmediaapplication.dto.response.GetEndUserResponse;
 import com.manager.socialmediaapplication.dto.response.GetEndUsersResponse;
 
 public interface EndUserServiceInterface {
-    void createEndUser(EndUserCreationRequest endUserCreationRequest);
+    GetEndUserResponse createEndUser(EndUserCreationRequest endUserCreationRequest);
     GetEndUsersResponse getEndUsers(Integer pageNo, Integer pageSize, String order);
 
     GetEndUserResponse getEndUserResponseById(long userId);

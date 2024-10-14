@@ -18,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -31,9 +33,34 @@ public class EndUserServiceTest {
     @Test
     void test_createEndUser_Success() {
         EndUserCreationRequest endUserCreationRequest = new EndUserCreationRequest();
+        EndUserProjection endUserProjection = new EndUserProjection() {
+            @Override
+            public String getId() {
+                return "1";
+            }
+
+            @Override
+            public String getName() {
+                return "Test User";
+            }
+
+            @Override
+            public String getEmail() {
+                return "test@example.com";
+            }
+        };
         endUserCreationRequest.setEmail("test@example.com");
         endUserCreationRequest.setName("Test User");
-        endUserService.createEndUser(endUserCreationRequest);
+        EndUser endUser = new EndUser();
+        endUser.setId(1L);
+        endUser.setEmail("test@example.com");
+        endUser.setName("Test User");
+        when(endUserRepository.save(any(EndUser.class))).thenReturn(endUser);
+        endUserRepository.save(endUser);
+        when(endUserRepository.findEndUserById(anyLong())).thenReturn(endUserProjection);
+        GetEndUserResponse response = endUserService.createEndUser(endUserCreationRequest);
+        assertNotNull(response);
+        assertEquals(endUserProjection, response.getEndUserProjection());
     }
 
     @Test

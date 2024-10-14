@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,12 +33,12 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createComment(@Valid @RequestBody CommentCreationRequest request) {
+    public ResponseEntity<GetCommentResponse> createComment(@Valid @RequestBody CommentCreationRequest request) {
         endUserValidationService.doesUserExist(request.getUserId());
         postValidationService.doesPostExist(request.getPostId());
         commentValidationService.isPostValid(request.getPostId(), request.getParentId());
-        commentServiceInterface.createComment(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        GetCommentResponse response = commentServiceInterface.createComment(request);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{commentId}")

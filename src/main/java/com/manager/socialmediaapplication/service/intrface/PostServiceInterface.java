@@ -6,7 +6,7 @@ import com.manager.socialmediaapplication.dto.response.GetPostResponse;
 import com.manager.socialmediaapplication.dto.response.GetPostsResponse;
 
 public interface PostServiceInterface {
-    void createPost(PostCreationRequest request);
+    GetPostResponse createPost(PostCreationRequest request);
 
     GetPostsResponse getPosts(Integer pageSize, Integer pageNo, String orderBy);
 

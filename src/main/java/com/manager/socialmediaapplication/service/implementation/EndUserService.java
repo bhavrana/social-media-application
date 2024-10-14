@@ -34,12 +34,16 @@ public class EndUserService implements EndUserServiceInterface {
     }
 
     @Override
-    public void createEndUser(EndUserCreationRequest endUserCreationRequest) {
+    public GetEndUserResponse createEndUser(EndUserCreationRequest endUserCreationRequest) {
         EndUser endUser = new EndUser();
         endUser.setEmail(endUserCreationRequest.getEmail());
         endUser.setName(endUserCreationRequest.getName());
         try {
-            endUserRepository.save(endUser);
+            EndUser newUser = endUserRepository.save(endUser);
+            GetEndUserResponse response = new GetEndUserResponse();
+            EndUserProjection endUserProjection = endUserRepository.findEndUserById(newUser.getId());
+            response.setEndUserProjection(endUserProjection);
+            return response;
         } catch (Exception e) {
             log.error("Error creating end user", e);
             throw new UserCreationException(e.getMessage());

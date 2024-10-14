@@ -57,24 +57,102 @@ public class CommentServiceTest {
     @Test
     void createCommentWithoutParentTest() {
         CommentCreationRequest request = new CommentCreationRequest("Content", 1L, 1L, null);
+        CommentProjection commentProjection = new CommentProjection() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
+            public String getContent() {
+                return request.getContent();
+            }
+
+            @Override
+            public LocalDateTime getCreatedDate() {
+                return LocalDateTime.now();
+            }
+
+            @Override
+            public String getEndUserName() {
+                return "Test User";
+            }
+
+            @Override
+            public Long getLikeCount() {
+                return 0L;
+            }
+
+            @Override
+            public Long getDislikeCount() {
+                return 0L;
+            }
+        };
         Post post = new Post();
         EndUser endUser = new EndUser();
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setContent(request.getContent());
+        comment.setEndUser(endUser);
+        comment.setPost(post);
         when(postRepository.findById(request.getPostId())).thenReturn(Optional.of(post));
         when(endUserRepository.findById(request.getUserId())).thenReturn(Optional.of(endUser));
-        commentService.createComment(request);
-        verify(commentRepository, times(1)).save(any(Comment.class));
+        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+        when(commentRepository.findCommentByCommentId(anyLong())).thenReturn(commentProjection);
+        GetCommentResponse response = commentService.createComment(request);
+        assertNotNull(response);
+        assertEquals(commentProjection, response.getCommentProjection());
     }
 
     @Test
     void createCommentWithParentTest() {
         CommentCreationRequest request = new CommentCreationRequest("Content", 1L, 1L, 1L);
+        CommentProjection commentProjection = new CommentProjection() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
+            public String getContent() {
+                return request.getContent();
+            }
+
+            @Override
+            public LocalDateTime getCreatedDate() {
+                return LocalDateTime.now();
+            }
+
+            @Override
+            public String getEndUserName() {
+                return "Test User";
+            }
+
+            @Override
+            public Long getLikeCount() {
+                return 0L;
+            }
+
+            @Override
+            public Long getDislikeCount() {
+                return 0L;
+            }
+        };
         Post post = new Post();
         EndUser endUser = new EndUser();
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setContent(request.getContent());
+        comment.setEndUser(endUser);
+        comment.setPost(post);
         when(postRepository.findById(request.getPostId())).thenReturn(Optional.of(post));
         when(endUserRepository.findById(request.getUserId())).thenReturn(Optional.of(endUser));
         when(commentRepository.findById(request.getParentId())).thenReturn(Optional.of(new Comment()));
-        commentService.createComment(request);
-        verify(commentRepository, times(1)).save(any(Comment.class));
+        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+        when(commentRepository.findCommentByCommentId(anyLong())).thenReturn(commentProjection);
+        GetCommentResponse response = commentService.createComment(request);
+        assertNotNull(response);
+        assertEquals(commentProjection, response.getCommentProjection());
     }
 
     @Test

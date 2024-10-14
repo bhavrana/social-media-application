@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +27,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createEndUser(@Valid @RequestBody EndUserCreationRequest endUserCreationRequest) {
-        endUserServiceInterface.createEndUser(endUserCreationRequest);
-        return ResponseEntity.ok(HttpStatus.CREATED);
+    public ResponseEntity<GetEndUserResponse> createEndUser(@Valid @RequestBody EndUserCreationRequest endUserCreationRequest) {
+        GetEndUserResponse response = endUserServiceInterface.createEndUser(endUserCreationRequest);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping

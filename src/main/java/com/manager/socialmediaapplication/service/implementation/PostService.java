@@ -17,8 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostService implements PostServiceInterface {
@@ -34,12 +32,14 @@ public class PostService implements PostServiceInterface {
     }
 
     @Override
-    public void createPost(PostCreationRequest request) {
+    public GetPostResponse createPost(PostCreationRequest request) {
         EndUser endUser = endUserService.getEndUserById(request.getUserId());
         Post post = new Post();
         post.setContent(request.getContent());
         post.setEndUser(endUser);
-        postRepository.save(post);
+        Post newpost = postRepository.save(post);
+        GetPostResponse response  = new GetPostResponse(postRepository.findPostByPostId(newpost.getId()));
+        return response;
     }
 
     @Override

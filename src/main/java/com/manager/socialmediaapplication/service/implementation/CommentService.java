@@ -36,7 +36,7 @@ public class CommentService implements CommentServiceInterface {
 
 
     @Override
-    public void createComment(CommentCreationRequest request) {
+    public GetCommentResponse createComment(CommentCreationRequest request) {
         Post post = postRepository.findById(request.getPostId()).get();
         EndUser endUser = endUserRepository.findById(request.getUserId()).get();
         Comment comment = new Comment();
@@ -44,7 +44,9 @@ public class CommentService implements CommentServiceInterface {
         comment.setPost(post);
         comment.setContent(request.getContent());
         comment.setParent(request.getParentId() == null ? null : commentRepository.findById(request.getParentId()).get());
-        commentRepository.save(comment);
+        Comment newComment = commentRepository.save(comment);
+        GetCommentResponse response = new GetCommentResponse(commentRepository.findCommentByCommentId(newComment.getId()));
+        return response;
     }
 
     @Override

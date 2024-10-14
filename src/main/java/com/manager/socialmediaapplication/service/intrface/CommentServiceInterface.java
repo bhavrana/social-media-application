@@ -6,7 +6,7 @@ import com.manager.socialmediaapplication.dto.response.GetCommentResponse;
 import com.manager.socialmediaapplication.dto.response.GetCommentsResponse;
 
 public interface CommentServiceInterface {
-    void createComment(CommentCreationRequest request);
+    GetCommentResponse createComment(CommentCreationRequest request);
 
     GetCommentsResponse getCommentsForPost(Long postId, Integer pageSize, Integer pageNumber, String order);
 

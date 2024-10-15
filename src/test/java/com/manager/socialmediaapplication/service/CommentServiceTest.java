@@ -262,7 +262,8 @@ public class CommentServiceTest {
     @Test
     void testUpdateComment() {
         Long commentId = 1L;
-        UpdateCommentRequest request = new UpdateCommentRequest("Updated content");
+        UpdateCommentRequest request = new UpdateCommentRequest();
+        request.setUpdatedContent("Updated content");
         CommentProjection commentProjection = new CommentProjection() {
             @Override
             public Long getId() {

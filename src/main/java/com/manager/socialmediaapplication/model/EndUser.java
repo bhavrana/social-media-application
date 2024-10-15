@@ -13,7 +13,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
-public class EndUser extends BaseEntityExtension{
+public class EndUser extends BaseEntityExtension {
     @Column(nullable = false)
     String name;
 

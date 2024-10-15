@@ -12,7 +12,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PostReaction extends BaseEntity {
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     Post post;
 

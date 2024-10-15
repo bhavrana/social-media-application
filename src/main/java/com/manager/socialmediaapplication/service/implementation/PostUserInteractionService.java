@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
@@ -40,6 +39,7 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
 
     @Override
     public void likePost(Long postId, Long userId) {
+        log.info("Attempting to like post ID: {} by user ID: {}", postId, userId);
         // check if active entry exists under postUserInteraction
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
@@ -57,11 +57,13 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
                 postReaction.setDislikeCount(dislikeCount - 1);
                 postUserInteractionRepository.save(postUserInteraction);
                 postReactionRepository.save(postReaction);
+                log.info("Liked the post ID: {} by user ID: {}", postId, userId);
             } else {
-                log.info("The Post is already liked!");
+                log.info("The post ID: {} is already liked by user ID: {}", postId, userId);
             }
 
         } else {
+            log.info("Creating new like interaction for post ID: {} by user ID: {}", postId, userId);
             // Add like for post for the user
             Post post = postRepository.findById(postId).get();
             EndUser endUser = endUserRepository.findById(userId).get();
@@ -89,6 +91,7 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
 
     @Override
     public void dislikePost(Long postId, Long userId) {
+        log.info("Attempting to dislike post ID: {} by user ID: {}", postId, userId);
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
         Optional<PostReaction> optionalPostReaction = postReactionRepository.findByPost_Id(postId);
@@ -103,11 +106,13 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
                 postReaction.setLikeCount(likeCount - 1);
                 postUserInteractionRepository.save(postUserInteraction);
                 postReactionRepository.save(postReaction);
+                log.info("Disliked the previously liked post ID: {} by user ID: {}", postId, userId);
             } else {
-                log.info("The Post is already disliked!");
+                log.info("The post ID: {} is already disliked by user ID: {}", postId, userId);
             }
 
         } else {
+            log.info("Creating new dislike interaction for post ID: {} by user ID: {}", postId, userId);
             // Add dislike for post for the user
             Post post =   postRepository.findById(postId).get();
             EndUser endUser = endUserRepository.findById(userId).get();
@@ -135,22 +140,27 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
 
     @Override
     public GetEndUsersResponse getUserWhoLikedPostById(Long postId, Integer pageNo, Integer pageSize) {
+        log.info("Fetching users who liked post ID: {} with page number: {} and page size: {}", postId, pageNo, pageSize);
         GetEndUsersResponse response = new GetEndUsersResponse();
         Page<EndUserProjection> endUserProjectionList = postUserInteractionRepository.getUserLikeInteractionByPostId(postId, PageRequest.of(pageNo, pageSize));
+        log.info("Fetched {} users who liked the post ID: {}", endUserProjectionList.getTotalElements(), postId);
         response.setEndUserList(endUserProjectionList);
         return response;
     }
 
     @Override
     public GetEndUsersResponse getUserWhoDislikedPostById(Long postId, Integer pageNo, Integer pageSize) {
+        log.info("Fetching users who disliked post ID: {} with page number: {} and page size: {}", postId, pageNo, pageSize);
         GetEndUsersResponse response = new GetEndUsersResponse();
         Page<EndUserProjection> endUserProjectionList = postUserInteractionRepository.getUserDislikeInteractionByPostId(postId, PageRequest.of(pageNo, pageSize));
+        log.info("Fetched {} users who disliked the post ID: {}", endUserProjectionList.getTotalElements(), postId);
         response.setEndUserList(endUserProjectionList);
         return response;
     }
 
     @Override
     public void removeLikePost(long postId, long userId) {
+        log.info("Attempting to remove like from post ID: {} by user ID: {}", postId, userId);
         // check if active entry exists under postUserInteraction
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
@@ -163,9 +173,11 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
                 postUserInteraction.setIsActive(false);
                 Long likeCount = postReaction.getLikeCount();
                 postReaction.setLikeCount(likeCount - 1);
+                log.info("Removed like from post ID: {} by user ID: {}", postId, userId);
                 postUserInteractionRepository.save(postUserInteraction);
                 if (postReaction.getLikeCount() == 0 && postReaction.getDislikeCount() == 0) {
                     deletePostReactionById(postReaction.getId());
+                    log.info("Deleted reaction record for post ID: {} as it has no likes or dislikes", postId);
                 } else {
                     postReactionRepository.save(postReaction);
                 }
@@ -175,6 +187,7 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
 
     @Override
     public void removeDislikePost(long postId, long userId) {
+        log.info("Attempting to remove dislike from post ID: {} by user ID: {}", postId, userId);
         // check if active entry exists under postUserInteraction
         Optional<PostUserInteraction> optionalPostUserInteraction = postUserInteractionRepository
                 .findByEndUser_IdAndIsActiveAndPost_Id(userId, true,  postId);
@@ -184,12 +197,13 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
             PostReaction postReaction = optionalPostReaction.get();
             if (!postUserInteraction.getIsLiked()) {
                 postUserInteraction.setIsActive(false);
-
                 Long dislikeCount = postReaction.getDislikeCount();
                 postReaction.setDislikeCount(dislikeCount - 1);
+                log.info("Removed dislike from post ID: {} by user ID: {}", postId, userId);
                 postUserInteractionRepository.save(postUserInteraction);
                 if (postReaction.getLikeCount() == 0 && postReaction.getDislikeCount() == 0) {
                     deletePostReactionById(postReaction.getId());
+                    log.info("Deleted reaction record for post ID: {} as it has no likes or dislikes", postId);
                 } else {
                     postReactionRepository.save(postReaction);
                 }
@@ -198,6 +212,12 @@ public class PostUserInteractionService implements PostUserInteractionerviceInte
     }
 
     void deletePostReactionById(Long id) {
-        postReactionRepository.deleteById(id);
+        try {
+            log.info("Deleting reaction record with ID: {}", id);
+            postReactionRepository.deleteById(id);
+            log.info("Successfully deleted reaction record with ID: {}", id);
+        } catch (Exception e) {
+            log.error("Failed to delete reaction record with ID: {}", id, e);
+        }
     }
 }

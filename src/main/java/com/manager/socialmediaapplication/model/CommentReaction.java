@@ -12,7 +12,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Setter
 public class CommentReaction extends BaseEntity{
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "comment_id", referencedColumnName = "id")
     Comment comment;
 

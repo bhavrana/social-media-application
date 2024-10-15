@@ -127,7 +127,8 @@ public class CommentControllerTest {
     @Test
     void test_updateComment_Success() {
         long commentId = 1L;
-        UpdateCommentRequest request = new UpdateCommentRequest("Updated");
+        UpdateCommentRequest request = new UpdateCommentRequest();
+        request.setUpdatedContent("Updated");
         doNothing().when(commentValidationService).doesCommentExist(commentId);
         GetCommentResponse response = new GetCommentResponse();
         when(commentService.updateComment(commentId, request)).thenReturn(response);
@@ -141,7 +142,8 @@ public class CommentControllerTest {
     @Test
     void test_updateComment_WithNonExistingComment() {
         long commentId = 1L;
-        UpdateCommentRequest request = new UpdateCommentRequest("Updated");
+        UpdateCommentRequest request = new UpdateCommentRequest();
+        request.setUpdatedContent("Updated");
         doThrow(new CommentNotFoundException("Comment not found for Id " + commentId)).when(commentValidationService).doesCommentExist(commentId);
 
         assertThrows(CommentNotFoundException.class, () -> commentController.updateComment(commentId, request));

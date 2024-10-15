@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+@Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(value =
             "SELECT c.id AS id, c.content AS content, c.created_date AS createdDate, u.name AS endUserName, COALESCE(cr.like_count, 0) AS likeCount, COALESCE(cr.dislike_count, 0) AS dislikeCount FROM comment c " +

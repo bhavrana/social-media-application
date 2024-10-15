@@ -79,7 +79,7 @@ public class EndUserServiceTest {
         Integer pageNo = 0;
         Integer pageSize = 10;
         String orderBy = "ASC";
-        Sort sort = Sort.by("CREATED_DATE").ascending();
+        Sort sort = Sort.by("id").ascending();
         Page<EndUserProjection> endUsers = Page.empty();
         when(endUserRepository.findAllProjectedBy(PageRequest.of(pageNo, pageSize, sort))).thenReturn(endUsers);
         GetEndUsersResponse response = endUserService.getEndUsers(pageNo, pageSize, orderBy);
@@ -92,7 +92,7 @@ public class EndUserServiceTest {
         Integer pageNo = 0;
         Integer pageSize = 10;
         String orderBy = "DESC";
-        Sort sort = Sort.by("CREATED_DATE").descending();
+        Sort sort = Sort.by("id").descending();
         Page<EndUserProjection> endUsers = Page.empty();
         when(endUserRepository.findAllProjectedBy(PageRequest.of(pageNo, pageSize, sort))).thenReturn(endUsers);
         GetEndUsersResponse response = endUserService.getEndUsers(pageNo, pageSize, orderBy);

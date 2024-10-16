@@ -38,9 +38,6 @@ public class Comment extends BaseEntityExtension {
     @OneToMany(mappedBy="parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> children;
 
-    //@Column(nullable = true, name = "parent_id")
-    //Long parentId;
-
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CommentUserInteraction> commentUserInteractions;
 }

@@ -19,3 +19,7 @@
 * REST API’s endpoints and integration to connect back end system
 * Tests Cases
 ---
+**Notes**
+---
+* The Design directory contains all the HLD/LLD related images and documents
+---
